@@ -916,10 +916,14 @@ No updates available. You may force an upgrade to a specific release image, but 
 [ec2-user@ip-10-0-0-161 ~]$ 
 ~~~
 
-=========================================================================================================================================================
-============== below is the behaviour when https proxy was not set in install config despite config stating otherwise====================================
-=========================================================================================================================================================
 
+
+
+
+
+===below is the behaviour when https proxy was not set in install config despite docs stating otherwise===
+- this part is just for having in captured what happens if https proxy is/was currently not set, what it looks like and how to get it sorted
+~~~~
 [ec2-user@ip-10-0-0-161 ~]$ oc adm upgrade
 Cluster version is 4.3.1
 
@@ -1053,7 +1057,5 @@ Updates:
 VERSION IMAGE
 4.3.2   quay.io/openshift-release-dev/ocp-release@sha256:cadf53e7181639f6cc77d2430339102db2908de330210c1ff8c7a7dc1cb0e550
 [ec2-user@ip-10-0-0-161 ~]$ 
-=========================================================================================================================================================
-============== above is the behaviour when https proxy was not set in install config despite config stating otherwise====================================
-=========================================================================================================================================================
-
+~~~~
+===above is the behaviour when https proxy was not set in install config despite docs stating otherwise===
