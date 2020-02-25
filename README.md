@@ -315,7 +315,8 @@ forwarded_for delete
 
 ----------------------------------------------------------------------------------------------
 - configure aws tools as well on bastion 
-~~
+
+~~~
 $ mkdir $HOME/.aws
 $ export AWSKEY= <redacted>
 $ export AWSSECRETKEY= <redacted>
@@ -332,6 +333,7 @@ $ aws sts get-caller-identity
   
 ----------------------------------------------------------------------------------------------
 - create ssh key (basically follow docs) 
+
 ~~~
 $ ssh-keygen -t rsa -b 2048 -N '' -f ~/.ssh/id_rsa
 ~~~
@@ -346,6 +348,7 @@ $ ip a |grep 10.0.0
 
 ----------------------------------------------------------------------------------------------
 - configure install-config.yaml
+
 ~~~
 $ vim install-config.yaml
 $ cat install-config.yaml
