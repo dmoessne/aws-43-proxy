@@ -35,130 +35,155 @@ EOF
 
 $ aws sts get-caller-identity
 ~~~
--------------------------------------------------------------------------------------------
 - now we can start creating aws objects from the local machine 
 
+-------------------------------------------------------------------------------------------
 - create vpc 
-
-aws ec2 create-vpc --cidr-block 10.0.0.0/16
-aws ec2 create-tags --resources vpc-04c5fa0e09be1cae7 --tags Key=Name,Value=dmoessne-vpc2
-aws ec2 modify-vpc-attribute --vpc-id vpc-04c5fa0e09be1cae7 --enable-dns-hostnames
-aws ec2 modify-vpc-attribute --vpc-id vpc-04c5fa0e09be1cae7 --enable-dns-support
-aws ec2 describe-vpcs --vpc-ids vpc-04c5fa0e09be1cae7
-aws ec2 describe-dhcp-options --dhcp-options-ids dopt-7d4aee18
-
+~~~
+$ aws ec2 create-vpc --cidr-block 10.0.0.0/16
+$ aws ec2 create-tags --resources vpc-04c5fa0e09be1cae7 --tags Key=Name,Value=dmoessne-vpc2
+$ aws ec2 modify-vpc-attribute --vpc-id vpc-04c5fa0e09be1cae7 --enable-dns-hostnames
+$ aws ec2 modify-vpc-attribute --vpc-id vpc-04c5fa0e09be1cae7 --enable-dns-support
+$ aws ec2 describe-vpcs --vpc-ids vpc-04c5fa0e09be1cae7
+$ aws ec2 describe-dhcp-options --dhcp-options-ids dopt-7d4aee18
+~~~
 -------------------------------------------------------------------------------------------
 - create subnets 
 
-aws ec2 create-subnet --vpc-id vpc-04c5fa0e09be1cae7 --availability-zone eu-west-1a --cidr-block 10.0.0.0/24
-aws ec2 create-tags --resources subnet-0a57ce90ddc3ee179 --tags Key=Name,Value=dmoessne2-public-1a
+~~~
+$ aws ec2 create-subnet --vpc-id vpc-04c5fa0e09be1cae7 --availability-zone eu-west-1a --cidr-block 10.0.0.0/24
+$ aws ec2 create-tags --resources subnet-0a57ce90ddc3ee179 --tags Key=Name,Value=dmoessne2-public-1a
 
-aws ec2 create-subnet --vpc-id vpc-04c5fa0e09be1cae7 --availability-zone eu-west-1a --cidr-block 10.0.1.0/24
-aws ec2 create-tags --tags Key=Name,Value=dmoessne2-private-1a --resources subnet-05e26a80b438d3f0c
+$ aws ec2 create-subnet --vpc-id vpc-04c5fa0e09be1cae7 --availability-zone eu-west-1a --cidr-block 10.0.1.0/24
+$ aws ec2 create-tags --tags Key=Name,Value=dmoessne2-private-1a --resources subnet-05e26a80b438d3f0c
 
-aws ec2 create-subnet --vpc-id vpc-04c5fa0e09be1cae7 --availability-zone eu-west-1b --cidr-block 10.0.2.0/24
-aws ec2 create-tags --tags Key=Name,Value=dmoessne2-private-1b --resources subnet-07e68f234ec25fdbc
+$ aws ec2 create-subnet --vpc-id vpc-04c5fa0e09be1cae7 --availability-zone eu-west-1b --cidr-block 10.0.2.0/24
+$ aws ec2 create-tags --tags Key=Name,Value=dmoessne2-private-1b --resources subnet-07e68f234ec25fdbc
 
-aws ec2 create-subnet --vpc-id vpc-04c5fa0e09be1cae7 --availability-zone eu-west-1c --cidr-block 10.0.3.0/24
-aws ec2 create-tags --tags Key=Name,Value=dmoessne2-private-1c --resources subnet-008258ad985c916df
+$ aws ec2 create-subnet --vpc-id vpc-04c5fa0e09be1cae7 --availability-zone eu-west-1c --cidr-block 10.0.3.0/24
+$ aws ec2 create-tags --tags Key=Name,Value=dmoessne2-private-1c --resources subnet-008258ad985c916df
+~~~
 
 ----------------------------------------------------------------------------------------------
-
 - create internet gateway for bastion/proxy host in public network 
 
-aws ec2 create-internet-gateway
-aws ec2 create-tags --tags Key=Name,Value=dmoessne2-igw --resources igw-0906e224dcfad7373
+~~~
+$ aws ec2 create-internet-gateway
+$ aws ec2 create-tags --tags Key=Name,Value=dmoessne2-igw --resources igw-0906e224dcfad7373
+~~~
 
 -------------------------------------------------------------------------------------------
-
-
 - create routing tables:
 
-aws ec2 create-route-table --vpc-id vpc-04c5fa0e09be1cae7
-aws ec2 create-tags --tags Key=Name,Value=dmoessne2-public-rtb --resources rtb-07e15e7aebbfb99b7
+~~~
+$ aws ec2 create-route-table --vpc-id vpc-04c5fa0e09be1cae7
+$ aws ec2 create-tags --tags Key=Name,Value=dmoessne2-public-rtb --resources rtb-07e15e7aebbfb99b7
 
-aws ec2 create-route-table --vpc-id vpc-04c5fa0e09be1cae7
-aws ec2 create-tags --tags Key=Name,Value=dmoessne2-private-rtb --resources rtb-09a14c33b16ed1d22
-
+$ aws ec2 create-route-table --vpc-id vpc-04c5fa0e09be1cae7
+$ aws ec2 create-tags --tags Key=Name,Value=dmoessne2-private-rtb --resources rtb-09a14c33b16ed1d22
+~~~
 
 - link internetgateway to routing table to be associated with  public subnet 
-aws ec2 create-route --route-table-id rtb-07e15e7aebbfb99b7 --destination-cidr-block 0.0.0.0/0 --gateway-id igw-0906e224dcfad7373
+
+~~~
+$ aws ec2 create-route --route-table-id rtb-07e15e7aebbfb99b7 --destination-cidr-block 0.0.0.0/0 --gateway-id igw-0906e224dcfad7373
+~~~
 
 - describe/check created routintables 
-aws ec2 describe-route-tables --route-table-id rtb-07e15e7aebbfb99b7
-aws ec2 describe-route-tables --route-table-id rtb-09a14c33b16ed1d22
+~~~
+$ aws ec2 describe-route-tables --route-table-id rtb-07e15e7aebbfb99b7
+$ aws ec2 describe-route-tables --route-table-id rtb-09a14c33b16ed1d22
 
-aws ec2 describe-subnets --filters --filters "Name=vpc-id,Values=vpc-04c5fa0e09be1cae7" --output text
-
+$ aws ec2 describe-subnets --filters --filters "Name=vpc-id,Values=vpc-04c5fa0e09be1cae7" --output text
+~~~
 
 - associate routing tables to subnets 
-aws ec2 associate-route-table  --subnet-id subnet-0a57ce90ddc3ee179 --route-table-id rtb-07e15e7aebbfb99b7
-aws ec2 associate-route-table  --route-table-id rtb-09a14c33b16ed1d22 --subnet-id subnet-008258ad985c916df
-aws ec2 associate-route-table  --route-table-id rtb-09a14c33b16ed1d22 --subnet-id subnet-07e68f234ec25fdbc
-aws ec2 associate-route-table  --route-table-id rtb-09a14c33b16ed1d22 --subnet-id subnet-subnet-05e26a80b438d3f0c
+
+~~~
+$ aws ec2 associate-route-table  --subnet-id subnet-0a57ce90ddc3ee179 --route-table-id rtb-07e15e7aebbfb99b7
+$ aws ec2 associate-route-table  --route-table-id rtb-09a14c33b16ed1d22 --subnet-id subnet-008258ad985c916df
+$ aws ec2 associate-route-table  --route-table-id rtb-09a14c33b16ed1d22 --subnet-id subnet-07e68f234ec25fdbc
+$ aws ec2 associate-route-table  --route-table-id rtb-09a14c33b16ed1d22 --subnet-id subnet-subnet-05e26a80b438d3f0c
+~~~
 
 - replave default with custom  
-aws ec2 describe-route-tables  --filter "Name=vpc-id,Values=vpc-04c5fa0e09be1cae7" --output text
-aws ec2 replace-route-table-association --association-id rtbassoc-0eb6c034ce742b12a --route-table-id rtb-07e15e7aebbfb99b7
+
+~~~
+$ aws ec2 describe-route-tables  --filter "Name=vpc-id,Values=vpc-04c5fa0e09be1cae7" --output text
+$ aws ec2 replace-route-table-association --association-id rtbassoc-0eb6c034ce742b12a --route-table-id rtb-07e15e7aebbfb99b7
+~~~
 
 - remove default ruting table 
-aws ec2 delete-route-table --route-table-id rtb-029e5a594c416d2e2
-aws ec2 describe-route-tables  --filter "Name=vpc-id,Values=vpc-04c5fa0e09be1cae7" --output text
+~~~
+$ aws ec2 delete-route-table --route-table-id rtb-029e5a594c416d2e2
+$ aws ec2 describe-route-tables  --filter "Name=vpc-id,Values=vpc-04c5fa0e09be1cae7" --output text
+~~~
 
 ----------------------------------------------------------------------------------------------
-
 - check Network ACLs 
   - already there:
-aws ec2   describe-network-acls --filter "Name=vpc-id,Values=vpc-04c5fa0e09be1cae7"
+
+~~~
+$ aws ec2   describe-network-acls --filter "Name=vpc-id,Values=vpc-04c5fa0e09be1cae7"
+~~~
 
 --> we could make it even more restrictive for private nets, for now outbount is allowed all all
 --> possibly revisit later 
 
 ----------------------------------------------------------------------------------------------
 - create security groups (mostly needed for testing and the bastion/proxy)
+- public-sg
 
--- public-sg
-aws ec2 create-security-group --description dmoessne-public-sg --group-name dmoessne-public-sg --vpc-id vpc-04c5fa0e09be1cae7
-aws ec2 authorize-security-group-ingress --group-id  sg-0274aa6dbe8821264 --protocol tcp --port 22 --cidr 0.0.0.0/0
-aws ec2 authorize-security-group-ingress --group-id  sg-0274aa6dbe8821264 --protocol all  --cidr 10.0.0.0/16
-aws ec2 create-tags --resources sg-0274aa6dbe8821264 --tags Key=Name,Value=dmoessne2-sg-public
+~~~
+$ aws ec2 create-security-group --description dmoessne-public-sg --group-name dmoessne-public-sg --vpc-id vpc-04c5fa0e09be1cae7
+$ aws ec2 authorize-security-group-ingress --group-id  sg-0274aa6dbe8821264 --protocol tcp --port 22 --cidr 0.0.0.0/0
+$ aws ec2 authorize-security-group-ingress --group-id  sg-0274aa6dbe8821264 --protocol all  --cidr 10.0.0.0/16
+$ aws ec2 create-tags --resources sg-0274aa6dbe8821264 --tags Key=Name,Value=dmoessne2-sg-public
 aws ec2   describe-security-groups --group-id sg-0274aa6dbe8821264
 - private sg 
-aws ec2 create-security-group --description dmoessne-private-sg --group-name dmoessne-private-sg --vpc-id vpc-04c5fa0e09be1cae7
-aws ec2 create-tags --resources sg-0004d7665bdd62df6--tags Key=Name,Value=dmoessne2-sg-private
-aws ec2 authorize-security-group-ingress --group-id sg-0004d7665bdd62df6  --protocol all  --cidr 10.0.0.0/16
-aws ec2 authorize-security-group-egress --group-id  sg-0004d7665bdd62df6  --protocol all  --cidr 10.0.0.0/16
-aws ec2 describe-security-groups --group-id sg-0004d7665bdd62df6
-aws ec2 revoke-security-group-egress --group-id sg-0004d7665bdd62df6 --protocol all --cidr 0.0.0.0/0
-aws ec2 describe-security-groups --group-id sg-0004d7665bdd62df6
-----------------------------------------------------------------------------------------------
+$ aws ec2 create-security-group --description dmoessne-private-sg --group-name dmoessne-private-sg --vpc-id vpc-04c5fa0e09be1cae7
+$ aws ec2 create-tags --resources sg-0004d7665bdd62df6--tags Key=Name,Value=dmoessne2-sg-private
+$ aws ec2 authorize-security-group-ingress --group-id sg-0004d7665bdd62df6  --protocol all  --cidr 10.0.0.0/16
+$ aws ec2 authorize-security-group-egress --group-id  sg-0004d7665bdd62df6  --protocol all  --cidr 10.0.0.0/16
+$ aws ec2 describe-security-groups --group-id sg-0004d7665bdd62df6
+$ aws ec2 revoke-security-group-egress --group-id sg-0004d7665bdd62df6 --protocol all --cidr 0.0.0.0/0
+$ aws ec2 describe-security-groups --group-id sg-0004d7665bdd62df6
+~~~
 
+----------------------------------------------------------------------------------------------
 - create EPs
 
-aws ec2 describe-vpc-endpoint-services
+~~~
+$ aws ec2 describe-vpc-endpoint-services
 
-aws ec2 create-vpc-endpoint --vpc-endpoint-type Gateway --vpc-id vpc-04c5fa0e09be1cae7 --service-name com.amazonaws.eu-west-1.s3 --route-table-ids rtb-09a14c33b16ed1d22  --no-private-dns-enabled
-aws ec2 create-tags --resources  vpce-05d7946b28bbd1c9a --tags Key=Name,Value=dmoessne2-EP-s3
+$ aws ec2 create-vpc-endpoint --vpc-endpoint-type Gateway --vpc-id vpc-04c5fa0e09be1cae7 --service-name com.amazonaws.eu-west-1.s3 --route-table-ids rtb-09a14c33b16ed1d22  --no-private-dns-enabled
+$ aws ec2 create-tags --resources  vpce-05d7946b28bbd1c9a --tags Key=Name,Value=dmoessne2-EP-s3
 
-aws ec2 describe-vpc-endpoints --filter "Name=vpc-id,Values=vpc-04c5fa0e09be1cae7"
+$ aws ec2 describe-vpc-endpoints --filter "Name=vpc-id,Values=vpc-04c5fa0e09be1cae7"
+$ aws ec2 create-vpc-endpoint --vpc-endpoint-type Interface --vpc-id vpc-04c5fa0e09be1cae7 --service-name com.amazonaws.eu-west-1.elasticloadbalancing --subnet-ids "subnet-008258ad985c916df" "subnet-07e68f234ec25fdbc" "subnet-05e26a80b438d3f0c" 
+~~~
 
-aws ec2 create-vpc-endpoint --vpc-endpoint-type Interface --vpc-id vpc-04c5fa0e09be1cae7 --service-name com.amazonaws.eu-west-1.elasticloadbalancing --subnet-ids "subnet-008258ad985c916df" "subnet-07e68f234ec25fdbc" "subnet-05e26a80b438d3f0c" --private-dns-enabled
-aws ec2 create-tags --resources vpce-0cea48f4aed2512be --tags Key=Name,Value=dmoessne2-EP-elb
-aws ec2 modify-vpc-endpoint --vpc-endpoint-id vpce-0cea48f4aed2512be --remove-security-group-ids sg-0e157b13096816adc --add-security-group-ids sg-0004d7665bdd62df6
+--private-dns-enabled
 
-aws ec2 create-vpc-endpoint --vpc-endpoint-type Interface --vpc-id vpc-04c5fa0e09be1cae7 --service-name com.amazonaws.eu-west-1.ec2 --security-group-ids sg-0004d7665bdd62df6 --subnet-ids "subnet-008258ad985c916df" "subnet-07e68f234ec25fdbc" "subnet-05e26a80b438d3f0c" --private-dns-enabled
-aws ec2 create-tags --resources vpce-0f7e1031539ad6509 --tags Key=Name,Value=dmoessne2-EP-ec2
+~~~
+$ aws ec2 create-tags --resources vpce-0cea48f4aed2512be --tags Key=Name,Value=dmoessne2-EP-elb
+$ aws ec2 modify-vpc-endpoint --vpc-endpoint-id vpce-0cea48f4aed2512be --remove-security-group-ids sg-0e157b13096816adc --add-security-group-ids sg-0004d7665bdd62df6
 
+$ aws ec2 create-vpc-endpoint --vpc-endpoint-type Interface --vpc-id vpc-04c5fa0e09be1cae7 --service-name com.amazonaws.eu-west-1.ec2 --security-group-ids sg-0004d7665bdd62df6 --subnet-ids "subnet-008258ad985c916df" "subnet-07e68f234ec25fdbc" "subnet-05e26a80b438d3f0c" --private-dns-enabled
+$ aws ec2 create-tags --resources vpce-0f7e1031539ad6509 --tags Key=Name,Value=dmoessne2-EP-ec2
+~~~
 ----------------------------------------------------------------------------------------------
 
-Note:
+**Note:**
 - security groups cretated by terraform are not added to the EPs, namely com.amazonaws.eu-west-1.elasticloadbalancing and com.amazonaws.eu-west-1.ec2 
 - this leads to infuncional masters and workers are not being ctreated 
 - to add master and node sgs to EPs:
 
-aws ec2 describe-security-groups --filter "Name=vpc-id,Values=vpc-04c5fa0e09be1cae7" |egrep 'GroupId|master|worker' |egrep -B1 'master|worker'
-aws ec2 modify-vpc-endpoint --vpc-endpoint-id vpce-0cea48f4aed2512be  --add-security-group-ids "" ""
-aws ec2 modify-vpc-endpoint --vpc-endpoint-id vpce-0f7e1031539ad6509  --add-security-group-ids "" ""
+~~~
+$ aws ec2 describe-security-groups --filter "Name=vpc-id,Values=vpc-04c5fa0e09be1cae7" |egrep 'GroupId|master|worker' |egrep -B1 'master|worker'
+$ aws ec2 modify-vpc-endpoint --vpc-endpoint-id vpce-0cea48f4aed2512be  --add-security-group-ids "" ""
+$ aws ec2 modify-vpc-endpoint --vpc-endpoint-id vpce-0f7e1031539ad6509  --add-security-group-ids "" ""
+~~~
 
 - this can then be modified during or after the cluster has been created
 - if done afterwards, the install will time out, export KUBECONFIG, check and verify co's are failing not getting ready, machinesets are nt created,...
@@ -168,41 +193,58 @@ aws ec2 modify-vpc-endpoint --vpc-endpoint-id vpce-0f7e1031539ad6509  --add-secu
 - create instances
 
 - instance as bastion/proxy  (public network)
-aws ec2 run-instances --image-id ami-04facb3ed127a2eb6 --count 1 --instance-type  t2.medium --key-name dmoessne-key --security-group-ids sg-0274aa6dbe8821264 --subnet-id subnet-0a57ce90ddc3ee179  --associate-public-ip-address
-aws ec2 create-tags --tags Key=Name,Value=dmoessne2-public-bastion --resources i-09c3f84bff7c9fe65
+
+~~~
+$ aws ec2 run-instances --image-id ami-04facb3ed127a2eb6 --count 1 --instance-type  t2.medium --key-name dmoessne-key --security-group-ids sg-0274aa6dbe8821264 --subnet-id subnet-0a57ce90ddc3ee179  --associate-public-ip-address
+$ aws ec2 create-tags --tags Key=Name,Value=dmoessne2-public-bastion --resources i-09c3f84bff7c9fe65
+~~~
 
 - instance in private nw to validate network has no internet access and proxy is working 
-aws ec2 run-instances --image-id ami-0e61341fa75fcaa18 --count 1 --instance-type t2.micro --key-name dmoessne-key --security-group-ids sg-0004d7665bdd62df6 --subnet-id subnet-05e26a80b438d3f0c
-aws ec2 create-tags --tags Key=Name,Value=dmoessne2-private-proxy-test --resources
+
+~~~
+$ aws ec2 run-instances --image-id ami-0e61341fa75fcaa18 --count 1 --instance-type t2.micro --key-name dmoessne-key --security-group-ids sg-0004d7665bdd62df6 --subnet-id subnet-05e26a80b438d3f0c
+$ aws ec2 create-tags --tags Key=Name,Value=dmoessne2-private-proxy-test --resources
+~~~
 
 - get IPs 
-aws ec2 describe-instances --filters "Name=tag:Name,Values=dmoessne2*" --output text
+
+~~~
+$ aws ec2 describe-instances --filters "Name=tag:Name,Values=dmoessne2*" --output text
+~~~
 
 ----------------------------------------------------------------------------------------------
-
 - login to VM in public network and set up aws cli, ocp related/needed tools to maintain and deploy ocp as well as a very simple proxy 
-ssh -i ~/.ssh/dmoessne-key.pem ec2-user@ec2-<....>.eu-west-1.compute.amazonaws.com
+
+~~~
+$ ssh -i ~/.ssh/dmoessne-key.pem ec2-user@ec2-<....>.eu-west-1.compute.amazonaws.com
+~~~
 
 ----------------------------------------------------------------------------------------------
 - become root and install needed packages (RHEL8)
-sudo -i
-yum install -y firewalld squid vim wget unzip openssl python3 bind-utils
-alternatives --set python /usr/bin/python3
 
+~~~
+$ sudo -i
+# yum install -y firewalld squid vim wget unzip openssl python3 bind-utils
+# alternatives --set python /usr/bin/python3
+~~~
 ----------------------------------------------------------------------------------------------
 
 - enable FW and enable squid ports 
-systemctl enable firewalld --now
-firewall-cmd --add-port=3128/tcp --permanent
-firewall-cmd --add-port=3128/tcp
 
+~~~
+# systemctl enable firewalld --now
+# firewall-cmd --add-port=3128/tcp --permanent
+# firewall-cmd --add-port=3128/tcp
+~~~
 ----------------------------------------------------------------------------------------------
 
 - set up squid (very simple) 
-cp /etc/squid/squid.conf /etc/squid/squid.conf.orig
-vim /etc/squid/squid.conf
-cat /etc/squid/squid.conf
+
 ~~~
+# cp /etc/squid/squid.conf /etc/squid/squid.conf.orig
+# vim /etc/squid/squid.conf
+# cat /etc/squid/squid.conf
+-------<snip>------------
 acl SSL_ports port 443
 # Ports where clients can connect to.
 acl Safe_ports port 80		# http
@@ -248,67 +290,73 @@ refresh_pattern .		0	50%	20160
 
 # delete x-forwarded-for header in requests (anonymize them)
 forwarded_for delete
+-----<snap>----------
+
+# systemctl enable squid --now
 ~~~
-systemctl enable squid --now
 
 ----------------------------------------------------------------------------------------------
-
 - aws cli/ocp tools install and config 
-curl "https://s3.amazonaws.com/aws-cli/awscli-bundle.zip" -o "awscli-bundle.zip"
-unzip awscli-bundle.zip
-./awscli-bundle/install -i /usr/local/aws -b /bin/aws
-/bin/aws --version
 
-wget -qO - https://mirror.openshift.com/pub/openshift-v4/clients/ocp/latest/openshift-client-linux-4.3.1.tar.gz | tar xfz - -C /usr/bin/
-wget -qO - https://mirror.openshift.com/pub/openshift-v4/clients/ocp/latest/openshift-install-linux-4.3.1.tar.gz | tar xfz - -C /usr/bin/
+~~~
+# curl "https://s3.amazonaws.com/aws-cli/awscli-bundle.zip" -o "awscli-bundle.zip"
+# unzip awscli-bundle.zip
+# ./awscli-bundle/install -i /usr/local/aws -b /bin/aws
+# /bin/aws --version
 
-oc completion bash >/etc/bash_completion.d/openshift
-oc version
-openshift-install version
-logout
+# wget -qO - https://mirror.openshift.com/pub/openshift-v4/clients/ocp/latest/openshift-client-linux-4.3.1.tar.gz | tar xfz - -C /usr/bin/
+# wget -qO - https://mirror.openshift.com/pub/openshift-v4/clients/ocp/latest/openshift-install-linux-4.3.1.tar.gz | tar xfz - -C /usr/bin/
+
+# oc completion bash >/etc/bash_completion.d/openshift
+# oc version
+# openshift-install version
+# logout
+~~~
 
 ----------------------------------------------------------------------------------------------
-
 - configure aws tools as well on bastion 
-mkdir $HOME/.aws
-export AWSKEY= <redacted>
-export AWSSECRETKEY= <redacted>
-export REGION=eu-west-1
-cat << EOF >> $HOME/.aws/credentials
+~~
+$ mkdir $HOME/.aws
+$ export AWSKEY= <redacted>
+$ export AWSSECRETKEY= <redacted>
+$ export REGION=eu-west-1
+$ cat << EOF >> $HOME/.aws/credentials
 [default]
 aws_access_key_id = ${AWSKEY}
 aws_secret_access_key = ${AWSSECRETKEY}
 region = $REGION
 EOF
-
-aws sts get-caller-identity
-
-----------------------------------------------------------------------------------------------
-
-- create ssh key (basically follow docs) 
-
-ssh-keygen -t rsa -b 2048 -N '' -f ~/.ssh/id_rsa
-
-----------------------------------------------------------------------------------------------
-
-- check ip for proxy  
-ip a |grep 10.0.0
-    inet 10.0.0.161/24 brd 10.0.0.255 scope global dynamic noprefixroute eth0 
-
-----------------------------------------------------------------------------------------------
-
-- configure install-config.yaml
-
-vim install-config.yaml
-cat install-config.yaml
+$ 
+$ aws sts get-caller-identity
 ~~~
+  
+----------------------------------------------------------------------------------------------
+- create ssh key (basically follow docs) 
+~~~
+$ ssh-keygen -t rsa -b 2048 -N '' -f ~/.ssh/id_rsa
+~~~
+
+----------------------------------------------------------------------------------------------
+- check ip for proxy  
+
+~~~
+$ ip a |grep 10.0.0
+    inet 10.0.0.161/24 brd 10.0.0.255 scope global dynamic noprefixroute eth0 
+~~~
+
+----------------------------------------------------------------------------------------------
+- configure install-config.yaml
+~~~
+$ vim install-config.yaml
+$ cat install-config.yaml
+-------<snip>-------
 apiVersion: v1
 baseDomain: dmoessne2.csa2-lab.org
 proxy:
   httpProxy: http://10.0.0.161:3128
 ---
   httpsProxy: http://10.0.0.161:3128 <<-- looks like https needs to be set as well  --> confirmed when https is set although not different the upgrade part is working 
-----
+---
   noProxy: csa2-lab.org
 controlPlane:
   hyperthreading: Enabled
@@ -364,6 +412,7 @@ pullSecret: '....'
 fips: false
 sshKey: 'ssh-rsa ...' 
 publish: Internal
+----<snap>------
 ~~~
 ----------------------------------------------------------------------------------------------
 
