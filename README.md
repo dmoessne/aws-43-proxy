@@ -223,27 +223,27 @@ $ ssh -i ~/.ssh/dmoessne-key.pem ec2-user@ec2-<....>.eu-west-1.compute.amazonaws
 - become root and install needed packages (RHEL8)
 
 ~~~
-$ sudo -i
-# yum install -y firewalld squid vim wget unzip openssl python3 bind-utils
-# alternatives --set python /usr/bin/python3
+[ec2-user@ip-10-0-0-161 ~]$ sudo -i
+[root@ip-10-0-0-161 ~]# yum install -y firewalld squid vim wget unzip openssl python3 bind-utils
+[root@ip-10-0-0-161 ~]# alternatives --set python /usr/bin/python3
 ~~~
 ----------------------------------------------------------------------------------------------
 
 - enable FW and enable squid ports 
 
 ~~~
-# systemctl enable firewalld --now
-# firewall-cmd --add-port=3128/tcp --permanent
-# firewall-cmd --add-port=3128/tcp
+[root@ip-10-0-0-161 ~]# systemctl enable firewalld --now
+[root@ip-10-0-0-161 ~]# firewall-cmd --add-port=3128/tcp --permanent
+[root@ip-10-0-0-161 ~]# firewall-cmd --add-port=3128/tcp
 ~~~
 ----------------------------------------------------------------------------------------------
 
 - set up squid (very simple) 
 
 ~~~
-# cp /etc/squid/squid.conf /etc/squid/squid.conf.orig
-# vim /etc/squid/squid.conf
-# cat /etc/squid/squid.conf
+[root@ip-10-0-0-161 ~]# cp /etc/squid/squid.conf /etc/squid/squid.conf.orig
+[root@ip-10-0-0-161 ~]# vim /etc/squid/squid.conf
+[root@ip-10-0-0-161 ~]# cat /etc/squid/squid.conf
 -------<snip>------------
 acl SSL_ports port 443
 # Ports where clients can connect to.
@@ -292,57 +292,57 @@ refresh_pattern .		0	50%	20160
 forwarded_for delete
 -----<snap>----------
 
-# systemctl enable squid --now
+[root@ip-10-0-0-161 ~]# systemctl enable squid --now
 ~~~
 
 ----------------------------------------------------------------------------------------------
 - aws cli/ocp tools install and config 
 
 ~~~
-# curl "https://s3.amazonaws.com/aws-cli/awscli-bundle.zip" -o "awscli-bundle.zip"
-# unzip awscli-bundle.zip
-# ./awscli-bundle/install -i /usr/local/aws -b /bin/aws
-# /bin/aws --version
+[root@ip-10-0-0-161 ~]# curl "https://s3.amazonaws.com/aws-cli/awscli-bundle.zip" -o "awscli-bundle.zip"
+[root@ip-10-0-0-161 ~]# unzip awscli-bundle.zip
+[root@ip-10-0-0-161 ~]# ./awscli-bundle/install -i /usr/local/aws -b /bin/aws
+[root@ip-10-0-0-161 ~]# /bin/aws --version
 
-# wget -qO - https://mirror.openshift.com/pub/openshift-v4/clients/ocp/latest/openshift-client-linux-4.3.1.tar.gz | tar xfz - -C /usr/bin/
-# wget -qO - https://mirror.openshift.com/pub/openshift-v4/clients/ocp/latest/openshift-install-linux-4.3.1.tar.gz | tar xfz - -C /usr/bin/
+[root@ip-10-0-0-161 ~]# wget -qO - https://mirror.openshift.com/pub/openshift-v4/clients/ocp/latest/openshift-client-linux-4.3.1.tar.gz | tar xfz - -C /usr/bin/
+[root@ip-10-0-0-161 ~]# wget -qO - https://mirror.openshift.com/pub/openshift-v4/clients/ocp/latest/openshift-install-linux-4.3.1.tar.gz | tar xfz - -C /usr/bin/
 
-# oc completion bash >/etc/bash_completion.d/openshift
-# oc version
-# openshift-install version
-# logout
+[root@ip-10-0-0-161 ~]# oc completion bash >/etc/bash_completion.d/openshift
+[root@ip-10-0-0-161 ~]# oc version
+[root@ip-10-0-0-161 ~]# openshift-install version
+[root@ip-10-0-0-161 ~]# logout
 ~~~
 
 ----------------------------------------------------------------------------------------------
 - configure aws tools as well on bastion 
 
 ~~~
-$ mkdir $HOME/.aws
-$ export AWSKEY= <redacted>
-$ export AWSSECRETKEY= <redacted>
-$ export REGION=eu-west-1
-$ cat << EOF >> $HOME/.aws/credentials
+[ec2-user@ip-10-0-0-161 ~]$ mkdir $HOME/.aws
+[ec2-user@ip-10-0-0-161 ~]$ export AWSKEY= <redacted>
+[ec2-user@ip-10-0-0-161 ~]$ export AWSSECRETKEY= <redacted>
+[ec2-user@ip-10-0-0-161 ~]$ export REGION=eu-west-1
+[ec2-user@ip-10-0-0-161 ~]$ cat << EOF >> $HOME/.aws/credentials
 [default]
 aws_access_key_id = ${AWSKEY}
 aws_secret_access_key = ${AWSSECRETKEY}
 region = $REGION
 EOF
-$ 
-$ aws sts get-caller-identity
+[ec2-user@ip-10-0-0-161 ~]$ 
+[ec2-user@ip-10-0-0-161 ~]$ aws sts get-caller-identity
 ~~~
   
 ----------------------------------------------------------------------------------------------
 - create ssh key (basically follow docs) 
 
 ~~~
-$ ssh-keygen -t rsa -b 2048 -N '' -f ~/.ssh/id_rsa
+[ec2-user@ip-10-0-0-161 ~]$ ssh-keygen -t rsa -b 2048 -N '' -f ~/.ssh/id_rsa
 ~~~
 
 ----------------------------------------------------------------------------------------------
 - check ip for proxy  
 
 ~~~
-$ ip a |grep 10.0.0
+[ec2-user@ip-10-0-0-161 ~]$ ip a |grep 10.0.0
     inet 10.0.0.161/24 brd 10.0.0.255 scope global dynamic noprefixroute eth0 
 ~~~
 
@@ -350,8 +350,8 @@ $ ip a |grep 10.0.0
 - configure install-config.yaml
 
 ~~~
-$ vim install-config.yaml
-$ cat install-config.yaml
+[ec2-user@ip-10-0-0-161 ~]$ vim install-config.yaml
+[ec2-user@ip-10-0-0-161 ~]$ cat install-config.yaml
 -------<snip>-------
 apiVersion: v1
 baseDomain: dmoessne2.csa2-lab.org
@@ -424,10 +424,10 @@ publish: Internal
 - vm created earlier in priv subnet: 10.0.1.202
 - proxy server: 10.0.0.161:3128
 
-
 ----------------------------------------------------------------------------------------------
 
 - connect to VM in priv subnet 
+~~~
 [ec2-user@ip-10-0-0-161 ~]$ ssh -i ~/.ssh/dmoessne-key.pem 10.0.1.202
 The authenticity of host '10.0.1.202 (10.0.1.202)' can't be established.
 ECDSA key fingerprint is SHA256:rVN5VM5e3QrJm6eUcVhGSEuRyb8PL7vV2tuQhvU/X4E.
@@ -440,10 +440,12 @@ Warning: Permanently added '10.0.1.202' (ECDSA) to the list of known hosts.
 
 https://aws.amazon.com/amazon-linux-ami/2018.03-release-notes/
 [ec2-user@ip-10-0-1-202 ~]$ 
+~~~
 
 ----------------------------------------------------------------------------------------------
+- check DNS is working
 
--- check DNS is working
+~~~
 [ec2-user@ip-10-0-1-202 ~]$ nslookup google.com 
 Server:		10.0.0.2
 Address:	10.0.0.2#53
@@ -461,10 +463,11 @@ Name:	google.com
 Address: 74.125.193.138
 Name:	google.com
 Address: 74.125.193.139
+~~~
 
 ----------------------------------------------------------------------------------------------
-
 - validate no connection is possible
+~~~
 [ec2-user@ip-10-0-1-202 ~]$ ping google.com
 PING google.com (74.125.193.139) 56(84) bytes of data.
 ^C
@@ -480,32 +483,14 @@ PING google.com (74.125.193.139) 56(84) bytes of data.
 * Immediate connect fail for 2a00:1450:400b:c01::8a: Network is unreachable
 *   Trying 2a00:1450:400b:c01::8a...
 * TCP_NODELAY set
-* Immediate connect fail for 2a00:1450:400b:c01::8a: Network is unreachable
-*   Trying 2a00:1450:400b:c01::8a...
-* TCP_NODELAY set
-* Immediate connect fail for 2a00:1450:400b:c01::8a: Network is unreachable
-*   Trying 2a00:1450:400b:c01::8a...
-* TCP_NODELAY set
-* Immediate connect fail for 2a00:1450:400b:c01::8a: Network is unreachable
-*   Trying 2a00:1450:400b:c01::8a...
-* TCP_NODELAY set
-* Immediate connect fail for 2a00:1450:400b:c01::8a: Network is unreachable
-*   Trying 2a00:1450:400b:c01::8a...
-* TCP_NODELAY set
-* Immediate connect fail for 2a00:1450:400b:c01::8a: Network is unreachable
-*   Trying 2a00:1450:400b:c01::8a...
-* TCP_NODELAY set
-* Immediate connect fail for 2a00:1450:400b:c01::8a: Network is unreachable
-*   Trying 2a00:1450:400b:c01::8a...
-* TCP_NODELAY set
-* Immediate connect fail for 2a00:1450:400b:c01::8a: Network is unreachable
+[...]
 [ec2-user@ip-10-0-1-202 ~]$ 
+~~~
+
 ----------------------------------------------------------------------------------------------
-
-
 - set proxy and retest 
 
-[ec2-user@ip-10-0-1-202 ~]$ 
+~~~
 [ec2-user@ip-10-0-1-202 ~]$ export http_proxy=http://10.0.0.161:3128
 [ec2-user@ip-10-0-1-202 ~]$ export https_proxy=$http_proxy
 [ec2-user@ip-10-0-1-202 ~]$ curl -vv google.com
@@ -515,33 +500,14 @@ PING google.com (74.125.193.139) 56(84) bytes of data.
 * TCP_NODELAY set
 * Connected to 10.0.0.161 (10.0.0.161) port 3128 (#0)
 > GET http://google.com/ HTTP/1.1
-> Host: google.com
-> User-Agent: curl/7.61.1
-> Accept: */*
-> Proxy-Connection: Keep-Alive
-> 
-< HTTP/1.1 301 Moved Permanently
-< Location: http://www.google.com/
-< Content-Type: text/html; charset=UTF-8
-< Date: Tue, 25 Feb 2020 18:03:19 GMT
-< Expires: Thu, 26 Mar 2020 18:03:19 GMT
-< Cache-Control: public, max-age=2592000
-< Server: gws
-< Content-Length: 219
-< X-XSS-Protection: 0
-< X-Frame-Options: SAMEORIGIN
-< X-Cache: MISS from ip-10-0-0-161.eu-west-1.compute.internal
-< X-Cache-Lookup: MISS from ip-10-0-0-161.eu-west-1.compute.internal:3128
-< Via: 1.1 ip-10-0-0-161.eu-west-1.compute.internal (squid/4.4)
-< Connection: keep-alive
-< 
-<HTML><HEAD><meta http-equiv="content-type" content="text/html;charset=utf-8">
-<TITLE>301 Moved</TITLE></HEAD><BODY>
+[...]
 <H1>301 Moved</H1>
 The document has moved
 <A HREF="http://www.google.com/">here</A>.
 </BODY></HTML>
 * Connection #0 to host 10.0.0.161 left intact
+[ec2-user@ip-10-0-1-202 ~]$ 
+[ec2-user@ip-10-0-1-202 ~]$ 
 [ec2-user@ip-10-0-1-202 ~]$ curl -vv https://google.com
 * Rebuilt URL to: https://google.com/
 * Uses proxy env variable https_proxy == 'http://10.0.0.161:3128'
@@ -556,103 +522,62 @@ The document has moved
 > Proxy-Connection: Keep-Alive
 > 
 < HTTP/1.1 200 Connection established
-< 
-* Proxy replied 200 to CONNECT request
-* CONNECT phase completed!
-* ALPN, offering h2
-* ALPN, offering http/1.1
-* Cipher selection: ALL:!EXPORT:!EXPORT40:!EXPORT56:!aNULL:!LOW:!RC4:@STRENGTH
-* successfully set certificate verify locations:
-*   CAfile: /etc/pki/tls/certs/ca-bundle.crt
-  CApath: none
-* TLSv1.2 (OUT), TLS header, Certificate Status (22):
-* TLSv1.2 (OUT), TLS handshake, Client hello (1):
-* CONNECT phase completed!
-* CONNECT phase completed!
-* TLSv1.2 (IN), TLS handshake, Server hello (2):
-* TLSv1.2 (IN), TLS handshake, Certificate (11):
-* TLSv1.2 (IN), TLS handshake, Server key exchange (12):
-* TLSv1.2 (IN), TLS handshake, Server finished (14):
-* TLSv1.2 (OUT), TLS handshake, Client key exchange (16):
-* TLSv1.2 (OUT), TLS change cipher, Change cipher spec (1):
-* TLSv1.2 (OUT), TLS handshake, Finished (20):
-* TLSv1.2 (IN), TLS change cipher, Change cipher spec (1):
-* TLSv1.2 (IN), TLS handshake, Finished (20):
-* SSL connection using TLSv1.2 / ECDHE-ECDSA-AES128-GCM-SHA256
-* ALPN, server accepted to use h2
-* Server certificate:
-*  subject: C=US; ST=California; L=Mountain View; O=Google LLC; CN=*.google.com
-*  start date: Feb 12 11:47:11 2020 GMT
-*  expire date: May  6 11:47:11 2020 GMT
-*  subjectAltName: host "google.com" matched cert's "google.com"
-*  issuer: C=US; O=Google Trust Services; CN=GTS CA 1O1
-*  SSL certificate verify ok.
-* Using HTTP2, server supports multi-use
-* Connection state changed (HTTP/2 confirmed)
-* Copying HTTP/2 data in stream buffer to connection buffer after upgrade: len=0
-* Using Stream ID: 1 (easy handle 0x1a4dd10)
-> GET / HTTP/2
-> Host: google.com
-> User-Agent: curl/7.61.1
-> Accept: */*
-> 
-* Connection state changed (MAX_CONCURRENT_STREAMS == 100)!
-< HTTP/2 301 
-< location: https://www.google.com/
-< content-type: text/html; charset=UTF-8
-< date: Tue, 25 Feb 2020 18:03:27 GMT
-< expires: Thu, 26 Mar 2020 18:03:27 GMT
-< cache-control: public, max-age=2592000
-< server: gws
-< content-length: 220
-< x-xss-protection: 0
-< x-frame-options: SAMEORIGIN
-< alt-svc: quic=":443"; ma=2592000; v="46,43",h3-Q050=":443"; ma=2592000,h3-Q049=":443"; ma=2592000,h3-Q048=":443"; ma=2592000,h3-Q046=":443"; ma=2592000,h3-Q043=":443"; ma=2592000
-< 
-<HTML><HEAD><meta http-equiv="content-type" content="text/html;charset=utf-8">
-<TITLE>301 Moved</TITLE></HEAD><BODY>
-<H1>301 Moved</H1>
+[...]
 The document has moved
 <A HREF="https://www.google.com/">here</A>.
 </BODY></HTML>
 * Connection #0 to host 10.0.0.161 left intact
 [ec2-user@ip-10-0-1-202 ~]$
+~~~
+
 ----------------------------------------------------------------------------------------------
 - logout agian 
 
+~~~
 [ec2-user@ip-10-0-1-202 ~]$ logout
 Connection to 10.0.1.202 closed.
 [ec2-user@ip-10-0-0-161 ~]$ 
+~~~
 
 ----------------------------------------------------------------------------------------------
-
 - finally, let's deploy and see where we end up 
-mkdir ~/cluster
-cp install-config.yaml ~/cluster
-openshift-install create cluster --dir=./cluster --log-level debug
+
+~~~
+[ec2-user@ip-10-0-0-161 ~]$ mkdir ~/cluster
+[ec2-user@ip-10-0-0-161 ~]$ cp install-config.yaml ~/cluster
+[ec2-user@ip-10-0-0-161 ~]$ openshift-install create cluster --dir=./cluster --log-level debug
 
 at stage  DEBUG Terraform has been successfully initialized and when gs are created we need to add them to the right endpoints, othersie the install does not complete as no nodes are created,........
 this can be done later and cluster recovers 
+[...]
+~~~~
+
 -------
 meanwhile - can be done later too, but leads to an error ..
-[dmoessne@frodo ~]$ aws ec2 describe-security-groups --filter "Name=vpc-id,Values=vpc-04c5fa0e09be1cae7" |egrep 'GroupId|master|worker' |egrep -B1 'master|worker'
+
+~~~
+$ aws ec2 describe-security-groups --filter "Name=vpc-id,Values=vpc-04c5fa0e09be1cae7" |egrep 'GroupId|master|worker' |egrep -B1 'master|worker'
             "GroupId": "sg-09462f9dcbe9f1415",
                     "Value": "test-cluster-72qvd-master-sg"
 --
             "GroupId": "sg-095237c3631e85c7b",
                     "Value": "test-cluster-72qvd-worker-sg"
-[dmoessne@frodo ~]$ 
+$ 
 
-[dmoessne@frodo ~]$ aws ec2 modify-vpc-endpoint --vpc-endpoint-id vpce-0f7e1031539ad6509  --add-security-group-ids sg-09462f9dcbe9f1415 sg-095237c3631e85c7b
+$ aws ec2 modify-vpc-endpoint --vpc-endpoint-id vpce-0f7e1031539ad6509  --add-security-group-ids sg-09462f9dcbe9f1415 sg-095237c3631e85c7b
 {
     "Return": true
 }
-[dmoessne@frodo ~]$ aws ec2 modify-vpc-endpoint --vpc-endpoint-id vpce-0cea48f4aed2512be  --add-security-group-ids sg-095237c3631e85c7b sg-095237c3631e85c7b
+$ aws ec2 modify-vpc-endpoint --vpc-endpoint-id vpce-0cea48f4aed2512be  --add-security-group-ids sg-095237c3631e85c7b sg-095237c3631e85c7b
 {
     "Return": true
 }
+~~~
+
 ------------------
+- watch openshift instakllation
 
+~~~
 [ec2-user@ip-10-0-0-161 ~]$ openshift-install create cluster --dir=./cluster --log-level debug
 DEBUG OpenShift Installer v4.3.1                   
 DEBUG Built from commit 2055609f95b19322ee6cfdd0bea73399297c4a3e 
@@ -728,6 +653,7 @@ INFO To access the cluster as the system:admin user when using 'oc', run 'export
 INFO Access the OpenShift web-console here: https://console-openshift-console.apps.test-cluster.dmoessne2.csa2-lab.org 
 INFO Login to the console with user: kubeadmin, password: hEMYP-JDuAg-KRveS-WPdnL 
 [ec2-user@ip-10-0-0-161 ~]$ 
+~~~
 
 ----------------------------------------------------------------------------------------------
 - 2 ways possible here 
@@ -744,10 +670,10 @@ INFO Login to the console with user: kubeadmin, password: hEMYP-JDuAg-KRveS-WPdn
 ----------------------------------------------------------------------------------------------
 
 - export KUBECONFIG and check status
+~~~
+[ec2-user@ip-10-0-0-161 ~]$ export KUBECONFIG=/home/ec2-user/cluster/auth/kubeconfig
 
-$ export KUBECONFIG=/home/ec2-user/cluster/auth/kubeconfig
-
-$ oc get co 
+[ec2-user@ip-10-0-0-161 ~]$ oc get co 
 NAME                                       VERSION   AVAILABLE   PROGRESSING   DEGRADED   SINCE
 authentication                             4.3.1     True        False         False      19m
 cloud-credential                           4.3.1     True        False         False      43m
@@ -776,18 +702,20 @@ service-ca                                 4.3.1     True        False         F
 service-catalog-apiserver                  4.3.1     True        False         False      35m
 service-catalog-controller-manager         4.3.1     True        False         False      35m
 storage                                    4.3.1     True        False         False      35m
-$ 
+[ec2-user@ip-10-0-0-161 ~]$ 
 
-$ oc adm upgrade
+[ec2-user@ip-10-0-0-161 ~]$ oc adm upgrade
 Cluster version is 4.3.1
 
 No updates available. You may force an upgrade to a specific release image, but doing so may not be supported and result in downtime or data loss.
-$ 
-----------------------------------------------------------------------------------------------
+[ec2-user@ip-10-0-0-161 ~]$
+~~~
 
+----------------------------------------------------------------------------------------------
 - for testing purposes we change the channel to candidate DO NOT USE THIS IN PROD AND EVEN BE CAREFUL FOR TESTS : https://access.redhat.com/articles/4495171
 
-$ oc get clusterversions.config.openshift.io  -o yaml 
+~~~
+[ec2-user@ip-10-0-0-161 ~]$ oc get clusterversions.config.openshift.io  -o yaml 
 apiVersion: v1
 items:
 - apiVersion: config.openshift.io/v1
@@ -802,10 +730,10 @@ items:
   spec:
     channel: stable-4.3
 [....]
-$ oc edit clusterversion 
+[ec2-user@ip-10-0-0-161 ~]$ oc edit clusterversion 
 clusterversion.config.openshift.io/version edited
-$ 
-$ oc get clusterversions.config.openshift.io  -o yaml 
+[ec2-user@ip-10-0-0-161 ~]$ 
+[ec2-user@ip-10-0-0-161 ~]$ oc get clusterversions.config.openshift.io  -o yaml 
 apiVersion: v1
 items:
 - apiVersion: config.openshift.io/v1
@@ -820,8 +748,8 @@ items:
   spec:
     channel: candidate-4.3
 [....]
-$
-$ oc logs -f cluster-version-operator-558c886d49-7x5nn -n openshift-cluster-version
+[ec2-user@ip-10-0-0-161 ~]$
+[ec2-user@ip-10-0-0-161 ~]$ oc logs -f cluster-version-operator-558c886d49-7x5nn -n openshift-cluster-version
 ....
 I0225 22:23:48.638083       1 cvo.go:479] Started syncing upgradeable "openshift-cluster-version/version" (2020-02-25 22:23:48.638075824 +0000 UTC m=+1513.485831826)
 I0225 22:23:48.638229       1 upgradeable.go:28] Upgradeable conditions were recently checked, will try later.
@@ -838,18 +766,18 @@ I0225 22:23:53.226569       1 cvo.go:392] Started syncing cluster version "opens
 I0225 22:23:53.226624       1 cvo.go:424] Desired version from operator is v1.Update{Version:"4.3.1", Image:"quay.io/openshift-release-dev/ocp-release@sha256:ea7ac3ad42169b39fce07e5e53403a028644810bee9a212e7456074894df40f3", Force:false}
 I0225 22:23:53.226692       1 cvo.go:394] Finished syncing cluster version "openshift-cluster-version/version" (129.724µs)
 ^C
-$
-$ oc adm upgrade
+[ec2-user@ip-10-0-0-161 ~]$
+[ec2-user@ip-10-0-0-161 ~]$ oc adm upgrade
 Cluster version is 4.3.1
 
 Updates:
 
 VERSION IMAGE
 4.3.2   quay.io/openshift-release-dev/ocp-release@sha256:cadf53e7181639f6cc77d2430339102db2908de330210c1ff8c7a7dc1cb0e550
-$ 
-$ oc adm upgrade --to-latest
+[ec2-user@ip-10-0-0-161 ~]$ 
+[ec2-user@ip-10-0-0-161 ~]$ oc adm upgrade --to-latest
 Updating to latest version 4.3.2
-$ date; oc adm upgrade
+[ec2-user@ip-10-0-0-161 ~]$ date; oc adm upgrade
 Tue Feb 25 22:26:06 UTC 2020
 Cluster version is 4.3.1
 
@@ -858,7 +786,7 @@ Updates:
 VERSION IMAGE
 4.3.2   quay.io/openshift-release-dev/ocp-release@sha256:cadf53e7181639f6cc77d2430339102db2908de330210c1ff8c7a7dc1cb0e550
 
-$ date; oc adm upgrade
+[ec2-user@ip-10-0-0-161 ~]$ date; oc adm upgrade
 Tue Feb 25 22:26:46 UTC 2020
 info: An upgrade is in progress. Unable to apply 4.3.2: the update could not be applied
 
@@ -866,33 +794,34 @@ Updates:
 
 VERSION IMAGE
 4.3.2   quay.io/openshift-release-dev/ocp-release@sha256:cadf53e7181639f6cc77d2430339102db2908de330210c1ff8c7a7dc1cb0e550
-$ oc adm upgrade
+[ec2-user@ip-10-0-0-161 ~]$ oc adm upgrade
 info: An upgrade is in progress. Unable to apply 4.3.2: the update could not be applied
 
 Updates:
 
 VERSION IMAGE
 4.3.2   quay.io/openshift-release-dev/ocp-release@sha256:cadf53e7181639f6cc77d2430339102db2908de330210c1ff8c7a7dc1cb0e550
-$ oc adm upgrade
+[ec2-user@ip-10-0-0-161 ~]$ oc adm upgrade
 info: An upgrade is in progress. Unable to apply 4.3.2: the update could not be applied
 
 Updates:
 
 VERSION IMAGE
 4.3.2   quay.io/openshift-release-dev/ocp-release@sha256:cadf53e7181639f6cc77d2430339102db2908de330210c1ff8c7a7dc1cb0e550
-$ oc adm upgrade
+[ec2-user@ip-10-0-0-161 ~]$ oc adm upgrade
 info: An upgrade is in progress. Working towards 4.3.2: 10% complete
 
 No updates available. You may force an upgrade to a specific release image, but doing so may not be supported and result in downtime or data loss.
-$ date; oc adm upgrade
+[ec2-user@ip-10-0-0-161 ~]$ date; oc adm upgrade
 Tue Feb 25 22:29:06 UTC 2020
 info: An upgrade is in progress. Working towards 4.3.2: 16% complete
 
 No updates available. You may force an upgrade to a specific release image, but doing so may not be supported and result in downtime or data loss.
-$ 
+[ec2-user@ip-10-0-0-161 ~]$ 
 
+.... time goes by .....
 
-$ oc get co 
+[ec2-user@ip-10-0-0-161 ~]$ oc get co 
 NAME                                       VERSION   AVAILABLE   PROGRESSING   DEGRADED   SINCE
 authentication                             4.3.2     True        False         False      46m
 cloud-credential                           4.3.2     True        False         False      63m
@@ -921,19 +850,19 @@ service-ca                                 4.3.2     True        False         F
 service-catalog-apiserver                  4.3.2     True        False         False      57m
 service-catalog-controller-manager         4.3.2     True        False         False      57m
 storage                                    4.3.2     True        False         False      25m
-$ 
-$ oc project openshift-machine-api 
+[ec2-user@ip-10-0-0-161 ~]$ 
+[ec2-user@ip-10-0-0-161 ~]$ oc project openshift-machine-api 
 
-$ oc get mc |grep 10m$
+[ec2-user@ip-10-0-0-161 ~]$ oc get mc |grep 10m$
 rendered-master-5861a738deb2dc2af9a0b78ca14bdc0f            3ad3a836ba89556b422454b4e5614dbd031ea3a3   2.2.0             10m
 rendered-worker-ad5345eeacf011c37d9aa14aaf366303            3ad3a836ba89556b422454b4e5614dbd031ea3a3   2.2.0             10m
-$ 
-$ oc get mcp
+[ec2-user@ip-10-0-0-161 ~]$ 
+[ec2-user@ip-10-0-0-161 ~]$ oc get mcp
 NAME     CONFIG                                             UPDATED   UPDATING   DEGRADED   MACHINECOUNT   READYMACHINECOUNT   UPDATEDMACHINECOUNT   DEGRADEDMACHINECOUNT
 master   rendered-master-945d021c2ea5c0704633b5ca04cdcb38   False     True       False      3              2                   2                     0
 worker   rendered-worker-ad5345eeacf011c37d9aa14aaf366303   True      False      False      3              3                   3                     0
-$ 
-$ oc get nodes 
+[ec2-user@ip-10-0-0-161 ~]$ 
+[ec2-user@ip-10-0-0-161 ~]$ oc get nodes 
 NAME                                       STATUS                     ROLES    AGE   VERSION
 ip-10-0-1-18.eu-west-1.compute.internal    Ready                      worker   55m   v1.16.2
 ip-10-0-1-21.eu-west-1.compute.internal    Ready                      master   63m   v1.16.2
@@ -941,7 +870,7 @@ ip-10-0-2-128.eu-west-1.compute.internal   Ready,SchedulingDisabled   master   6
 ip-10-0-2-217.eu-west-1.compute.internal   Ready                      worker   55m   v1.16.2
 ip-10-0-3-176.eu-west-1.compute.internal   Ready                      master   63m   v1.16.2
 ip-10-0-3-34.eu-west-1.compute.internal    Ready                      worker   55m   v1.16.2
-$ oc get nodes  -o wide
+[ec2-user@ip-10-0-0-161 ~]$ oc get nodes  -o wide
 NAME                                       STATUS                     ROLES    AGE   VERSION   INTERNAL-IP   EXTERNAL-IP   OS-IMAGE                                                       KERNEL-VERSION                CONTAINER-RUNTIME
 ip-10-0-1-18.eu-west-1.compute.internal    Ready                      worker   55m   v1.16.2   10.0.1.18     <none>        Red Hat Enterprise Linux CoreOS 43.81.202002110953.0 (Ootpa)   4.18.0-147.5.1.el8_1.x86_64   cri-o://1.16.3-19.dev.rhaos4.3.git6c1f4bd.el8
 ip-10-0-1-21.eu-west-1.compute.internal    Ready                      master   63m   v1.16.2   10.0.1.21     <none>        Red Hat Enterprise Linux CoreOS 43.81.202002110953.0 (Ootpa)   4.18.0-147.5.1.el8_1.x86_64   cri-o://1.16.3-19.dev.rhaos4.3.git6c1f4bd.el8
@@ -949,20 +878,20 @@ ip-10-0-2-128.eu-west-1.compute.internal   Ready,SchedulingDisabled   master   6
 ip-10-0-2-217.eu-west-1.compute.internal   Ready                      worker   55m   v1.16.2   10.0.2.217    <none>        Red Hat Enterprise Linux CoreOS 43.81.202002110953.0 (Ootpa)   4.18.0-147.5.1.el8_1.x86_64   cri-o://1.16.3-19.dev.rhaos4.3.git6c1f4bd.el8
 ip-10-0-3-176.eu-west-1.compute.internal   Ready                      master   63m   v1.16.2   10.0.3.176    <none>        Red Hat Enterprise Linux CoreOS 43.81.202002110953.0 (Ootpa)   4.18.0-147.5.1.el8_1.x86_64   cri-o://1.16.3-19.dev.rhaos4.3.git6c1f4bd.el8
 ip-10-0-3-34.eu-west-1.compute.internal    Ready                      worker   55m   v1.16.2   10.0.3.34     <none>        Red Hat Enterprise Linux CoreOS 43.81.202002110953.0 (Ootpa)   4.18.0-147.5.1.el8_1.x86_64   cri-o://1.16.3-19.dev.rhaos4.3.git6c1f4bd.el8
-$ 
+[ec2-user@ip-10-0-0-161 ~]$ 
 
 
 
-$ oc get mc |grep 12m$
+[ec2-user@ip-10-0-0-161 ~]$ oc get mc |grep 12m$
 rendered-master-5861a738deb2dc2af9a0b78ca14bdc0f            3ad3a836ba89556b422454b4e5614dbd031ea3a3   2.2.0             12m
 rendered-worker-ad5345eeacf011c37d9aa14aaf366303            3ad3a836ba89556b422454b4e5614dbd031ea3a3   2.2.0             12m
-$ 
-$ oc get mcp
+[ec2-user@ip-10-0-0-161 ~]$ 
+[ec2-user@ip-10-0-0-161 ~]$ oc get mcp
 NAME     CONFIG                                             UPDATED   UPDATING   DEGRADED   MACHINECOUNT   READYMACHINECOUNT   UPDATEDMACHINECOUNT   DEGRADEDMACHINECOUNT
 master   rendered-master-945d021c2ea5c0704633b5ca04cdcb38   False     True       False      3              2                   2                     0
 worker   rendered-worker-ad5345eeacf011c37d9aa14aaf366303   True      False      False      3              3                   3                     0
-$ 
-$ oc get nodes -o wide 
+[ec2-user@ip-10-0-0-161 ~]$ 
+[ec2-user@ip-10-0-0-161 ~]$ oc get nodes -o wide 
 NAME                                       STATUS   ROLES    AGE   VERSION   INTERNAL-IP   EXTERNAL-IP   OS-IMAGE                                                       KERNEL-VERSION                CONTAINER-RUNTIME
 ip-10-0-1-18.eu-west-1.compute.internal    Ready    worker   57m   v1.16.2   10.0.1.18     <none>        Red Hat Enterprise Linux CoreOS 43.81.202002110953.0 (Ootpa)   4.18.0-147.5.1.el8_1.x86_64   cri-o://1.16.3-19.dev.rhaos4.3.git6c1f4bd.el8
 ip-10-0-1-21.eu-west-1.compute.internal    Ready    master   65m   v1.16.2   10.0.1.21     <none>        Red Hat Enterprise Linux CoreOS 43.81.202002110953.0 (Ootpa)   4.18.0-147.5.1.el8_1.x86_64   cri-o://1.16.3-19.dev.rhaos4.3.git6c1f4bd.el8
@@ -970,22 +899,22 @@ ip-10-0-2-128.eu-west-1.compute.internal   Ready    master   65m   v1.16.2   10.
 ip-10-0-2-217.eu-west-1.compute.internal   Ready    worker   57m   v1.16.2   10.0.2.217    <none>        Red Hat Enterprise Linux CoreOS 43.81.202002110953.0 (Ootpa)   4.18.0-147.5.1.el8_1.x86_64   cri-o://1.16.3-19.dev.rhaos4.3.git6c1f4bd.el8
 ip-10-0-3-176.eu-west-1.compute.internal   Ready    master   65m   v1.16.2   10.0.3.176    <none>        Red Hat Enterprise Linux CoreOS 43.81.202002110953.0 (Ootpa)   4.18.0-147.5.1.el8_1.x86_64   cri-o://1.16.3-19.dev.rhaos4.3.git6c1f4bd.el8
 ip-10-0-3-34.eu-west-1.compute.internal    Ready    worker   57m   v1.16.2   10.0.3.34     <none>        Red Hat Enterprise Linux CoreOS 43.81.202002110953.0 (Ootpa)   4.18.0-147.5.1.el8_1.x86_64   cri-o://1.16.3-19.dev.rhaos4.3.git6c1f4bd.el8
-$ 
-$ oc get mcp
+[ec2-user@ip-10-0-0-161 ~]$ 
+[ec2-user@ip-10-0-0-161 ~]$ oc get mcp
 NAME     CONFIG                                             UPDATED   UPDATING   DEGRADED   MACHINECOUNT   READYMACHINECOUNT   UPDATEDMACHINECOUNT   DEGRADEDMACHINECOUNT
 master   rendered-master-5861a738deb2dc2af9a0b78ca14bdc0f   True      False      False      3              3                   3                     0
 worker   rendered-worker-ad5345eeacf011c37d9aa14aaf366303   True      False      False      3              3                   3                     0
-$ 
-$ oc adm upgrade
+[ec2-user@ip-10-0-0-161 ~]$ 
+[ec2-user@ip-10-0-0-161 ~]$ oc adm upgrade
 info: An upgrade is in progress. Working towards 4.3.2: 84% complete
 
 No updates available. You may force an upgrade to a specific release image, but doing so may not be supported and result in downtime or data loss.
-$ oc adm upgrade
+[ec2-user@ip-10-0-0-161 ~]$ oc adm upgrade
 Cluster version is 4.3.2
 
 No updates available. You may force an upgrade to a specific release image, but doing so may not be supported and result in downtime or data loss.
-$ 
-$ 
+[ec2-user@ip-10-0-0-161 ~]$ 
+~~~
 
 =========================================================================================================================================================
 ============== below is the behaviour when https proxy was not set in install config despite config stating otherwise====================================
