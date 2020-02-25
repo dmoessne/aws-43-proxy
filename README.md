@@ -14,27 +14,27 @@ this is DRAFT and WIP - also see https://bugzilla.redhat.com/show_bug.cgi?id=180
  
 -----
   - have locally aws cli set up according to docs so we can use it right away:
+~~~
+$ sudo -i 
+# curl "https://s3.amazonaws.com/aws-cli/awscli-bundle.zip" -o "awscli-bundle.zip"
+# unzip awscli-bundle.zip
+# ./awscli-bundle/install -i /usr/local/aws -b /bin/aws
+# /bin/aws --version
+# logout
 
-sudo -i 
-curl "https://s3.amazonaws.com/aws-cli/awscli-bundle.zip" -o "awscli-bundle.zip"
-unzip awscli-bundle.zip
-./awscli-bundle/install -i /usr/local/aws -b /bin/aws
-/bin/aws --version
-logout
-
-mkdir $HOME/.aws
-export AWSKEY= <redacted>
-export AWSSECRETKEY= <redacted>
-export REGION=eu-west-1
-cat << EOF >> $HOME/.aws/credentials
+$ mkdir $HOME/.aws
+$ export AWSKEY= <redacted>
+$ export AWSSECRETKEY= <redacted>
+$ export REGION=eu-west-1
+$ cat << EOF >> $HOME/.aws/credentials
 [default]
 aws_access_key_id = ${AWSKEY}
 aws_secret_access_key = ${AWSSECRETKEY}
 region = $REGION
 EOF
 
-aws sts get-caller-identity
-
+$ aws sts get-caller-identity
+~~~
 -------------------------------------------------------------------------------------------
 - now we can start creating aws objects from the local machine 
 
@@ -68,6 +68,7 @@ aws ec2 create-tags --tags Key=Name,Value=dmoessne2-private-1c --resources subne
 
 aws ec2 create-internet-gateway
 aws ec2 create-tags --tags Key=Name,Value=dmoessne2-igw --resources igw-0906e224dcfad7373
+
 -------------------------------------------------------------------------------------------
 
 
