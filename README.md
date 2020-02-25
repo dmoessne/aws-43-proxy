@@ -11,10 +11,10 @@ this is DRAFT and WIP - also see https://bugzilla.redhat.com/show_bug.cgi?id=180
   workers cannot be created and masters are not correctly seen (possibly more side effects i did not notice)
   
   en detail so far - no guarantee - not final yet 
-  
-  ~~~
+ 
+-----
   - have locally aws cli set up according to docs so we can use it right away:
-~~~
+
 sudo -i 
 curl "https://s3.amazonaws.com/aws-cli/awscli-bundle.zip" -o "awscli-bundle.zip"
 unzip awscli-bundle.zip
@@ -34,7 +34,7 @@ region = $REGION
 EOF
 
 aws sts get-caller-identity
-~~~
+
 -------------------------------------------------------------------------------------------
 - now we can start creating aws objects from the local machine 
 
@@ -133,7 +133,6 @@ aws ec2 describe-security-groups --group-id sg-0004d7665bdd62df6
 ----------------------------------------------------------------------------------------------
 
 - create EPs
-
 
 aws ec2 describe-vpc-endpoint-services
 
@@ -306,9 +305,9 @@ apiVersion: v1
 baseDomain: dmoessne2.csa2-lab.org
 proxy:
   httpProxy: http://10.0.0.161:3128
-~~~
+---
   httpsProxy: http://10.0.0.161:3128 <<-- looks like https needs to be set as well  --> confirmed when https is set although not different the upgrade part is working 
-~~~
+----
   noProxy: csa2-lab.org
 controlPlane:
   hyperthreading: Enabled
@@ -409,6 +408,7 @@ Name:	google.com
 Address: 74.125.193.138
 Name:	google.com
 Address: 74.125.193.139
+
 ----------------------------------------------------------------------------------------------
 
 - validate no connection is possible
@@ -934,17 +934,6 @@ No updates available. You may force an upgrade to a specific release image, but 
 $ 
 $ 
 
-
-
-
-
-
-
-
-
-
-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
 =========================================================================================================================================================
 ============== below is the behaviour when https proxy was not set in install config despite config stating otherwise====================================
 =========================================================================================================================================================
@@ -1086,4 +1075,3 @@ VERSION IMAGE
 ============== above is the behaviour when https proxy was not set in install config despite config stating otherwise====================================
 =========================================================================================================================================================
 
-  ~~~
