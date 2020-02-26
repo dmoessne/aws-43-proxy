@@ -6,7 +6,7 @@ this is DRAFT and WIP - also see https://bugzilla.redhat.com/show_bug.cgi?id=180
   - https proxy needs to be set although being similar to http proxy and no cert
   - additional endpoints need to be created and security groups added by terraform need to be added to EPs
       - com.amazonaws.< region >.elasticloadbalancing
-      - com.amazonaws. region .ec2
+      - com.amazonaws.< region >.ec2
   
   and attach them preferably during installation to the by terraform created security groups, as otherwise 
   workers cannot be created and masters are not correctly seen (possibly more side effects i did not notice)
