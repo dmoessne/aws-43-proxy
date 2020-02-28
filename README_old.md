@@ -1,4 +1,4 @@
-## Outdated!
+# Outdated!
 
 --> refer to https://github.com/dmoessne/aws-43-proxy/wiki
 
@@ -7,7 +7,7 @@
 
 
 
-# aws-43-proxy
+### aws-43-proxy
 OCP 4.3 setup on AWS via cli with proxy 
 
 this is DRAFT and WIP - also see https://bugzilla.redhat.com/show_bug.cgi?id=1805125
